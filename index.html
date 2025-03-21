@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnScene</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #B0E0E6, #E0FFFF);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #4682B4;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4682B4;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #5A9;
+        }
+        .message {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            input, textarea, button {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>OnScene</h1>
+    <input type="tel" id="phoneNumber" placeholder="Enter phone number" maxlength="10">
+    <textarea id="remarks" placeholder="Enter remarks (Max 500 characters)" maxlength="500"></textarea>
+    <button onclick="handleSubmit()">Submit</button>
+    <p class="message" id="message"></p>
+</div>
+<script>
+    function handleSubmit() {
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const remarks = document.getElementById('remarks').value;
+        const messageElement = document.getElementById('message');
+
+        if (!/^[0-9]{10}$/.test(phoneNumber)) {
+            messageElement.textContent = 'Invalid phone number. Enter a 10-digit number.';
+            messageElement.style.color = 'red';
+            return;
+        }
+
+        if (!/^[0-9]+$/.test(phoneNumber)) {
+            messageElement.textContent = 'Phone number should contain only digits.';
+            messageElement.style.color = 'red';
+            return;
+        }
+
+        if (remarks.length > 500) {
+            messageElement.textContent = 'Remarks should not exceed 500 characters.';
+            messageElement.style.color = 'red';
+            return;
+        }
+
+        fetch('/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phoneNumber, remarks })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageElement.textContent = 'Submission successful!';
+                messageElement.style.color = 'green';
+            } else {
+                messageElement.textContent = 'Submission failed!';
+                messageElement.style.color = 'red';
+            }
+        })
+        .catch(() => {
+            messageElement.textContent = 'Network error, please try again.';
+            messageElement.style.color = 'red';
+        });
+    }
+</script>
+</body>
+</html>
